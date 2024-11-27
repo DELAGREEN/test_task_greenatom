@@ -8,16 +8,18 @@ class XML2XLSX():
         self.current_dir = os.path.dirname(__file__)
         self.directory = fr'{self.current_dir}/{directory}'
         self.output_file = fr'{self.directory}/{output_file_name}'
+         # Создаем новый Excel-файл
+        self.workbook = Workbook()
+        self.worksheet = self.workbook.active
+        self.worksheet.title = 'currency'
+        self.max_row = None
+        self.max_col = None
+
 
     # Функция для парсинга XML и записи данных в Excel
     def parse_and_write(self):
-        # Создаем новый Excel-файл
-        workbook = Workbook()
-        worksheet = workbook.active
-        worksheet.title = 'currency'
-
         # Заголовки
-        worksheet.append([
+        self.worksheet.append([
             'Дата USD/RUB', 'Курс USD/RUB', 'Время USD/RUB',
             'Дата JPY/RUB', 'Курс JPY/RUB', 'Время JPY/RUB',
             'USD/RUB к JPY/RUB'
@@ -65,18 +67,18 @@ class XML2XLSX():
             usd_date, usd_rate, usd_time = usd
             jpy_date, jpy_rate, jpy_time = jpy
             rate_ratio = usd_rate / jpy_rate if usd_rate and jpy_rate else None
-            worksheet.append([usd_date, usd_rate, usd_time, jpy_date, jpy_rate, jpy_time, rate_ratio])
+            self.worksheet.append([usd_date, usd_rate, usd_time, jpy_date, jpy_rate, jpy_time, rate_ratio])
 
         # Форматируем столбцы
-        self.format_worksheet(worksheet)
+        self.format_worksheet()
 
         # Сохраняем Excel
-        workbook.save(self.output_file)
+        self.workbook.save(self.output_file)
 
     # Функция для форматирования столбцов 
-    def format_worksheet(self, worksheet):
+    def format_worksheet(self):
         # Автоширина для колонок
-        for column in worksheet.columns:
+        for column in self.worksheet.columns:
             max_length = 0
             column_letter = column[0].column_letter  # Получаем букву колонки
             for cell in column:
@@ -86,15 +88,17 @@ class XML2XLSX():
                 except:
                     pass
             adjusted_width = max_length + 2  # Добавляем запас
-            worksheet.column_dimensions[column_letter].width = adjusted_width
+            self.worksheet.column_dimensions[column_letter].width = adjusted_width
 
         # Форматирование числовых данных
-        for row in worksheet.iter_rows(min_row=2, max_row=worksheet.max_row, min_col=2, max_col=worksheet.max_column):
+        self.max_row = self.worksheet.max_row
+        self.max_col = self.worksheet.max_column
+        for row in self.worksheet.iter_rows(min_row= 2, max_row= self.max_row, min_col= 2, max_col= self.max_col):
             for cell in row:
                 if isinstance(cell.value, (int, float)):
                     cell.number_format = "# ##0.000"  # Финансовый формат
 
-    
+
     def run(self):
         self.parse_and_write()
 

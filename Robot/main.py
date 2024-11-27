@@ -253,6 +253,8 @@ if __name__ == "__main__":
     config_parser = ConfigParser('config.ini')
     binary_driver = config_parser.get('binary_driver')
     downloads_dir = config_parser.get('downloads_dir')
+    email_server = config_parser.get('email_server')
+    email_server_port = config_parser.get('email_server_port')
     login_email = config_parser.get('login_email')
     password = config_parser.get('password')
     recipient_email = config_parser.get('recipient_email')
@@ -267,7 +269,12 @@ if __name__ == "__main__":
 
     xml2xlsx = XML2XLSX(downloads_dir, output_xlsx_file_name)
     xml2xlsx.run()
+    max_row = xml2xlsx.max_row
 
-    mailer = Mailer(login_email, password, recipient_email, downloads_dir, output_xlsx_file_name)
+    if max_row is not None:
+        subject = 'Письмо с вложением'
+        message_text = f'Количество строк в файле:{max_row}'
+
+    mailer = Mailer(email_server, email_server_port, login_email, password, recipient_email, downloads_dir, output_xlsx_file_name, subject, message_text)
     mailer.run()
     

@@ -11,14 +11,16 @@ import shutil
 
 
 class Mailer():
-    def __init__(self, login, password, recipient, directory ,file_name):
+    def __init__(self, email_server, email_server_port, login, password, recipient, directory ,file_name, subject, message_text):
         # Настройки
         self.current_dir = os.path.dirname(__file__)
+        self.email_server = email_server
+        self.email_server_port = email_server_port
         self.login = login
         self.password = password  
         self.recipient = recipient
-        self.subject = 'Письмо с вложением'
-        self.text = 'Текст.'
+        self.subject = subject
+        self.message_text = message_text
         self.downloads_dir = fr'{self.current_dir}/{directory}'
         self.file_path = fr'{self.downloads_dir}/{file_name}'
         self.message = MIMEMultipart()
@@ -31,7 +33,7 @@ class Mailer():
 
     def append_mail_text(self):
         # Текст письма
-         self.message.attach(MIMEText(self.text, 'plain', 'utf-8'))
+         self.message.attach(MIMEText(self.message_text, 'plain', 'utf-8'))
 
     def append_mail_file(self):
         # Добавляем файл как вложение
@@ -58,7 +60,7 @@ class Mailer():
     def send_mail(self):
         # Отправляем письмо
         try:
-            server = smtp.SMTP('smtp.gmail.com', 587)
+            server = smtp.SMTP(self.email_server, int(self.email_server_port))
             server.starttls()
             server.login(self.login, self.password)
             server.sendmail(self.login, self.recipient, self.message.as_string())
