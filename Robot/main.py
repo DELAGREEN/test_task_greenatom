@@ -76,7 +76,7 @@ class Robot(object):
 
     def indicindicative_courses(self):
         #Жмём на индикативные курсы
-        element_indicative_courses = self.driver_get_element('/html/body/div[2]/div[4]/div/div/div[2]/div[1]/div/div[2]/div/div/div[3]/div[18]/div/a/span')
+        element_indicative_courses = self.driver_get_element('/html/body/div[2]/div[4]/div/div/div[1]/div[1]/div/div[2]/div/div/div[3]/div[18]/div/a/span')
         element_indicative_courses.click()
 
     def select_currency(self):
@@ -273,7 +273,7 @@ if __name__ == "__main__":
 
     if max_row is not None:
         subject = 'Письмо с вложением'
-        message_text = f'Количество строк в файле:{max_row}'
+        message_text = f'Количество строк в файле: {max_row}'
 
     mailer = Mailer(email_server, email_server_port, login_email, password, recipient_email, downloads_dir, output_xlsx_file_name, subject, message_text)
     mailer.run()
